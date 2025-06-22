@@ -1,54 +1,37 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import Loader from "./Loader";
-import ReCAPTCHA from "react-google-recaptcha";
 
 const LoginForm = () => {
   const { login } = useAuth();
-  const [isLoading,setIsLoading]=useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("student");
   const [error, setError] = useState("");
-  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(true); // ✅ Always true for dev
 
-  const handleCaptchaChange = (value) => {
-    setCaptchaVerified(!!value);
-  };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username || !password) {
       setError("Username and Password are required");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
+      setTimeout(() => setError(""), 3000);
       return;
     }
 
-    if (!captchaVerified) {
-      setError("Please verify the CAPTCHA");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-      return;
-    }
+   
 
     try {
       setIsLoading(true);
       setError("");
       await login(username, password, userType);
-      // Reset captcha after successful login
-      setCaptchaVerified(false);
+      
     } catch (err) {
       setError("Invalid credentials. Please try again.");
-      // Reset captcha after failed login
-      setCaptchaVerified(false);
-      setTimeout(() => {
-        setError("");
-      }, 3000);
-    }
-    finally{
+     
+      setTimeout(() => setError(""), 3000);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -84,6 +67,7 @@ const LoginForm = () => {
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
+
             <div className="mb-6">
               <input
                 className="w-full py-2 text-blue-500 bg-transparent border-b-2 border-blue-500 focus:outline-none focus:border-blue-500 placeholder-violet-400 px-2"
@@ -94,13 +78,7 @@ const LoginForm = () => {
               />
             </div>
 
-            {/* Google reCAPTCHA v2 */}
-            <div className="w-full flex justify-center mb-4">
-              <ReCAPTCHA
-                sitekey={`${import.meta.env.VITE_SITE_KEY}`}
-                onChange={handleCaptchaChange}
-              />
-            </div>
+        
 
             <button
               type="submit"
@@ -114,10 +92,8 @@ const LoginForm = () => {
               Login as {userType.charAt(0).toUpperCase() + userType.slice(1)}
             </button>
 
-            {error ? (
+            {error && (
               <div className="text-red-500 text-center mt-4">{error}</div>
-            ) : (
-              <div className="text-red-500 text-center mt-4"></div>
             )}
           </form>
         </div>
