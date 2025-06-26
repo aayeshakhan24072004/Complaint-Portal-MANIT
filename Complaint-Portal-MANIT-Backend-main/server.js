@@ -36,6 +36,6 @@ import job from "./cron.js";
 job.start();
 
 app.listen(PORT, () => {
-  console.log(`✅ Server is running at: http://localhost:${PORT}`);
+  console.log(`Server is running at: http://localhost:${PORT}`);
 });
 
